@@ -1,0 +1,1435 @@
+package com.gec.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.gec.entity.Admin;
+import com.gec.entity.Department;
+import com.gec.entity.File;
+import com.gec.entity.Notice;
+import com.gec.entity.PageModel;
+import com.gec.entity.Positions;
+import com.gec.entity.Staff;
+import com.gec.utils.DataSourceTool;
+
+public class AdminDao {
+	// 登录
+	public Admin queryByAccess(String staff_name, String staff_password) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from admin where name=? and password=?;";
+		System.out.println(sql);
+		try {
+			// 关闭自动提交
+			con.setAutoCommit(false);
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, staff_name);
+			statement.setString(2, staff_password);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			// 提交事务
+			con.commit();
+			// 设置自动提交
+			con.setAutoCommit(true);
+			while (result.next()) {
+				// 获取数据
+				int id = result.getInt("id");
+				String name = result.getString("name");
+				String head = result.getString("head");
+				String role = result.getString("role");
+				// 使用类来进行封装
+				Admin admin = new Admin(id, name, head, role);
+				// 将对象返回
+				return admin;
+			}
+		} catch (SQLException e) {
+			// 事务回滚
+			try {
+				con.rollback();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return null;
+	}
+
+	// 部门查询总记录数
+	public int queryAllCount_dep(String search) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select count(*) from department where name like ?;";
+		// 判断关键字是否为空
+		if (search == null) {
+			search = "";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, "%" + search + "%");
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				// 获取数据
+				return result.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return 0;
+	}
+
+	// 部门查询
+	public List<Department> admin_Q_dep(PageModel page, String search) {
+		// 定义一个集合用于存放数据
+		List<Department> departmentList = new ArrayList<>();
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from department where name like ? limit ?,?;";
+		// 判断关键字是否为空
+		if (search == null) {
+			search = "";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, "%" + search + "%");
+			// 设置数据
+			statement.setInt(2, page.getIndex());
+			statement.setInt(3, page.getNums());
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				int id = result.getInt("id");
+				String name = result.getString("name");
+				String describer = result.getString("describer");
+				// 使用类来进行封装
+				Department dep = new Department(id, name, describer);
+				// 将对象存放在list中
+				departmentList.add(dep);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回userList
+		return departmentList;
+	}
+
+	// 职位查询总记录数
+	public int queryAllCount_pos(String search) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select count(*) from (select positions.id,positions.name as pos_name,department.name as dep_name,positions.describer from positions,department where positions.department_id=department.id)tab where pos_name like ?;";
+		// 判断关键字是否为空
+		if (search == null) {
+			search = "";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, "%" + search + "%");
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				// 获取数据
+				return result.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return 0;
+	}
+
+	// 职位查询
+	public List<Positions> admin_Q_pos(PageModel page, String search) {
+		// 定义一个集合用于存放数据
+		List<Positions> positionsList = new ArrayList<>();
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from (select positions.id,positions.name as pos_name,department.name as dep_name,positions.describer from positions,department where positions.department_id=department.id)tab where pos_name like ? limit ?,?;";
+		// 判断关键字是否为空
+		if (search == null) {
+			search = "";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, "%" + search + "%");
+			// 设置数据
+			statement.setInt(2, page.getIndex());
+			statement.setInt(3, page.getNums());
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				int id = result.getInt("id");
+				String name = result.getString("pos_name");
+				String dep_name = result.getString("dep_name");
+				String describer = result.getString("describer");
+				// 使用类来进行封装
+				Positions positions = new Positions(id, name, dep_name, describer);
+				// 将对象存放在list中
+				positionsList.add(positions);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回userList
+		return positionsList;
+	}
+
+	// 公告查询总记录数
+	public int queryAllCount_not(String search) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select count(*) from (select notice.id,notice.title,notice.content,admin.name,notice.time as not_time from notice,admin where notice.admin_id=admin.id)tab where title like ?;";
+		// 判断关键字是否为空
+		if (search == null) {
+			search = "";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, "%" + search + "%");
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				// 获取数据
+				return result.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return 0;
+	}
+
+	// 公告查询
+	public List<Notice> admin_Q_not(PageModel page, String search) {
+		// 定义一个集合用于存放数据
+		List<Notice> noticeList = new ArrayList<>();
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from (select notice.id,notice.title,notice.content,admin.name,notice.time from notice,admin where notice.admin_id=admin.id)tab where title like ? limit ?,?;";
+		// 判断关键字是否为空
+		if (search == null) {
+			search = "";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, "%" + search + "%");
+			// 设置数据
+			statement.setInt(2, page.getIndex());
+			statement.setInt(3, page.getNums());
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				int id = result.getInt("id");
+				String title = result.getString("title");
+				String content = result.getString("content");
+				String name = result.getString("name");
+				String time = result.getString("time");
+				// 使用类来进行封装
+				Notice notice = new Notice(id, title, content, name, time);
+				// 将对象存放在list中
+				noticeList.add(notice);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回userList
+		return noticeList;
+	}
+
+	// 管理员查询总记录数
+	public int queryAllCount_adm(String search) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select count(*) from admin where name like ?;";
+		// 判断关键字是否为空
+		if (search == null) {
+			search = "";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, "%" + search + "%");
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				// 获取数据
+				return result.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return 0;
+	}
+
+	// 管理员查询
+	public List<Admin> admin_Q_adm(PageModel page, String search) {
+		// 定义一个集合用于存放数据
+		List<Admin> adminList = new ArrayList<>();
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from admin where name like ? limit ?,?;";
+		// 判断关键字是否为空
+		if (search == null) {
+			search = "";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, "%" + search + "%");
+			// 设置数据
+			statement.setInt(2, page.getIndex());
+			statement.setInt(3, page.getNums());
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				int id = result.getInt("id");
+				String name = result.getString("name");
+				String password = result.getString("password");
+				String head = result.getString("head");
+				String time = result.getString("time");
+				String role = result.getString("role");
+				// 使用类来进行封装
+				Admin admin = new Admin(id, name, password, head, time, role);
+				// 将对象存放在list中
+				adminList.add(admin);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回userList
+		return adminList;
+	}
+
+	// 员工查询总记录数
+	public int queryAllCount_sta(String search) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select count(*) from (select staff.id,staff.name,staff.password,staff.card,staff.sex,staff.head,positions.name as pos_name,department.name as dep_name,staff.phone,staff.time from staff,positions,department where staff.position_id=positions.id and staff.department_id=department.id)tab where name like ?;";
+		// 判断关键字是否为空
+		if (search == null) {
+			search = "";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, "%" + search + "%");
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				// 获取数据
+				return result.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return 0;
+	}
+
+	// 员工查询
+	public List<Staff> admin_Q_sta(PageModel page, String search) {
+		// 定义一个集合用于存放数据
+		List<Staff> adm_staffList = new ArrayList<>();
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from (select staff.id,staff.name,staff.password,staff.card,staff.sex,staff.head,positions.name as pos_name,department.name as dep_name,staff.phone,staff.time from staff,positions,department where staff.position_id=positions.id and staff.department_id=department.id)tab where name like ? limit ?,?;";
+		// 判断关键字是否为空
+		if (search == null) {
+			search = "";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, "%" + search + "%");
+			// 设置数据
+			statement.setInt(2, page.getIndex());
+			statement.setInt(3, page.getNums());
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				int id = result.getInt("id");
+				String name = result.getString("name");
+				String password = result.getString("password");
+				String card = result.getString("card");
+				String sex = result.getString("sex");
+				String head = result.getString("head");
+				String pos_name = result.getString("pos_name");
+				String dep_name = result.getString("dep_name");
+				String phone = result.getString("phone");
+				String time = result.getString("time");
+				// 使用类来进行封装
+				Staff staff = new Staff(id, name, password, card, sex, head, pos_name, dep_name, phone, time);
+				// 将对象存放在list中
+				adm_staffList.add(staff);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回userList
+		return adm_staffList;
+	}
+
+	// 文件查询总记录数
+	public int queryAllCount_file(String search) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select count(*) from (select file.id,file.title,file.name as file_name,staff.name,file.time from file,staff where file.upload_id=staff.id and file.identity='sta' union select file.id,file.title,file.name as file_name,admin.name,file.time from file,admin where file.upload_id=admin.id and file.identity='adm')tab where title like ?;";
+		// 判断关键字是否为空
+		if (search == null) {
+			search = "";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, "%" + search + "%");
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				// 获取数据
+				return result.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return 0;
+	}
+
+	// 文件查询
+	public List<File> admin_QD_file(PageModel page, String search) {
+		// 定义一个集合用于存放数据
+		List<File> fileList = new ArrayList<>();
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from (select file.id,file.title,file.name as file_name,staff.name,file.time from file,staff where file.upload_id=staff.id and file.identity='sta' union select file.id,file.title,file.name as file_name,admin.name,file.time from file,admin where file.upload_id=admin.id and file.identity='adm')tab where title like ? limit ?,?;";
+		// 判断关键字是否为空
+		if (search == null) {
+			search = "";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, "%" + search + "%");
+			// 设置数据
+			statement.setInt(2, page.getIndex());
+			statement.setInt(3, page.getNums());
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				int id = result.getInt("id");
+				String title = result.getString("title");
+				String file_name = result.getString("file_name");
+				String all_name = result.getString("name");
+				String time = result.getString("time");
+				// 使用类来进行封装
+				File file = new File(id, title, file_name, all_name, time);
+				// 将对象存放在list中
+				fileList.add(file);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回userList
+		return fileList;
+	}
+
+	// 根据id删除管理员
+	public boolean admin_D_adm(int adm_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "delete from admin where id=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, adm_id);
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 根据id查询修改管理员
+	public Admin admin_QU_adm(int adm_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from admin where id=?;";
+		System.out.println(sql);
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, adm_id);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				int id = result.getInt("id");
+				String name = result.getString("name");
+				String password = result.getString("password");
+				String head = result.getString("head");
+				String role = result.getString("role");
+				// 使用类来进行封装
+				Admin admin = new Admin(id, name, password, head, role);
+				// 将对象返回
+				return admin;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return null;
+	}
+
+	// 修改管理员
+	public boolean adm_update(Admin admin) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql;
+
+		if (admin.getHead() != null && !admin.getHead().equals("")) {
+			sql = "update admin set id=?,name=?,password=?,role=?,head=? where id=?;";
+		} else {
+			sql = "update admin set id=?,name=?,password=?,role=? where id=?;";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, admin.getId());
+			statement.setString(2, admin.getName());
+			statement.setString(3, admin.getPassword());
+			statement.setString(4, admin.getRole());
+			// 判断是否有图片
+			if (admin.getHead() != null && !admin.getHead().equals("")) {
+				statement.setString(5, admin.getHead());
+				statement.setInt(6, admin.getOld_id());
+			} else {
+				statement.setInt(5, admin.getOld_id());
+			}
+
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 添加管理员
+	public boolean adm_A_adm(Admin admin) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "insert into admin(name,password,head,time,role) values(?,?,?,?,?);";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, admin.getName());
+			statement.setString(2, admin.getPassword());
+			// 判断是否有图片
+			if (admin.getHead() != null && !admin.getHead().equals("")) {
+				statement.setString(3, admin.getHead());
+			} else {
+				statement.setString(3, "m.jpg");
+			}
+			statement.setString(4, admin.getTime());
+			statement.setString(5, admin.getRole());
+
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 根据id删除部门
+	public boolean admin_D_dep(int dep_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "delete from department where id=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, dep_id);
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 根据id查询修改部门
+	public Department admin_QU_dep(int dep_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from department where id=?;";
+		System.out.println(sql);
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, dep_id);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				int id = result.getInt("id");
+				String name = result.getString("name");
+				String describer = result.getString("describer");
+				// 使用类来进行封装
+				Department department = new Department(id, name, describer);
+				// 将对象返回
+				return department;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return null;
+	}
+
+	// 修改部门
+	public boolean dep_update(Department department) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "update department set id=?,name=?,describer=? where id=?";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, department.getId());
+			statement.setString(2, department.getName());
+			statement.setString(3, department.getDescriber());
+			statement.setInt(4, department.getOld_id());
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 添加部门
+	public boolean adm_A_dep(Department department) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "insert into department(name,describer) values(?,?);";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, department.getName());
+			statement.setString(2, department.getDescriber());
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 根据id删除职位
+	public boolean admin_D_pos(int pos_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "delete from positions where id=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, pos_id);
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 根据id查询修改职位
+	public Positions admin_QU_pos(int pos_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from positions where id=?;";
+		System.out.println(sql);
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, pos_id);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				int id = result.getInt("id");
+				String name = result.getString("name");
+				int department_id = result.getInt("department_id");
+				String describer = result.getString("describer");
+				// 使用类来进行封装
+				Positions positions = new Positions(id, name, department_id, describer);
+				// 将对象返回
+				return positions;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return null;
+	}
+
+	// 修改部门
+	public boolean pos_update(Positions positions) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "update positions set id=?,name=?,department_id=?,describer=? where id=?";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, positions.getId());
+			statement.setString(2, positions.getName());
+			statement.setInt(3, positions.getDepartment_id());
+			statement.setString(4, positions.getDescriber());
+			statement.setInt(5, positions.getOld_id());
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 添加职位
+	public boolean adm_A_pos(Positions positions) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "insert into positions(name,department_id,describer) values(?,?,?);";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, positions.getName());
+			statement.setInt(2, positions.getDepartment_id());
+			statement.setString(3, positions.getDescriber());
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 根据id删除公告
+	public boolean admin_D_not(int not_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "delete from notice where id=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, not_id);
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 根据id查询修改公告
+	public Notice admin_QU_not(int not_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from notice where id=?;";
+		System.out.println(sql);
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, not_id);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				int id = result.getInt("id");
+				String title = result.getString("title");
+				String content = result.getString("content");
+				int admin_id = result.getInt("admin_id");
+				// 使用类来进行封装
+				Notice notice = new Notice(id, title, content, admin_id);
+				// 将对象返回
+				return notice;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return null;
+	}
+
+	// 修改公告
+	public boolean not_update(Notice notice) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "update notice set id=?,title=?,content=?,admin_id=?,time=? where id=?";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, notice.getId());
+			statement.setString(2, notice.getTitle());
+			statement.setString(3, notice.getContent());
+			statement.setInt(4, notice.getAdmin_id());
+			statement.setString(5, notice.getTime());
+			statement.setInt(6, notice.getOld_id());
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 添加公告
+	public boolean adm_A_not(Notice notice) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "insert into notice(title,content,admin_id,time) values(?,?,?,?);";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, notice.getTitle());
+			statement.setString(2, notice.getContent());
+			statement.setInt(3, notice.getAdmin_id());
+			statement.setString(4, notice.getTime());
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 根据id删除员工
+	public boolean admin_D_sta(int sta_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "delete from staff where id=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, sta_id);
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 根据id查询修改员工
+	public Staff admin_QU_sta(int sta_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from staff where id=?;";
+		System.out.println(sql);
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, sta_id);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				int id = result.getInt("id");
+				String name = result.getString("name");
+				String password = result.getString("password");
+				String card = result.getString("card");
+				String sex = result.getString("sex");
+				String head = result.getString("head");
+				int position_id = result.getInt("position_id");
+				int department_id = result.getInt("department_id");
+				String phone = result.getString("phone");
+				// 使用类来进行封装
+				Staff staff = new Staff(id, name, password, card, sex, head, position_id, department_id, phone);
+				// 将对象返回
+				return staff;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return null;
+	}
+
+	// 修改员工
+	public boolean sta_update(Staff staff) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql;
+
+		if (staff.getHead() != null && !staff.getHead().equals("")) {
+			sql = "update staff set id=?,name=?,password=?,card=?,sex=?,position_id=?,department_id=?,phone=?,head=? where id=?;";
+		} else {
+			sql = "update staff set id=?,name=?,password=?,card=?,sex=?,position_id=?,department_id=?,phone=? where id=?;";
+		}
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, staff.getId());
+			statement.setString(2, staff.getName());
+			statement.setString(3, staff.getPassword());
+			statement.setString(4, staff.getCard());
+			statement.setString(5, staff.getSex());
+			statement.setInt(6, staff.getPosition_id());
+			statement.setInt(7, staff.getDepartment_id());
+			statement.setString(8, staff.getPhone());
+			// 判断是否有图片
+			if (staff.getHead() != null && !staff.getHead().equals("")) {
+				statement.setString(9, staff.getHead());
+				statement.setInt(10, staff.getOld_id());
+			} else {
+				statement.setInt(9, staff.getOld_id());
+			}
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 添加员工
+	public boolean adm_A_sta(Staff staff) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "insert into staff(name,password,card,sex,position_id,department_id,phone,time,head) values(?,?,?,?,?,?,?,?,?);";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, staff.getName());
+			statement.setString(2, staff.getPassword());
+			statement.setString(3, staff.getCard());
+			statement.setString(4, staff.getSex());
+			statement.setInt(5, staff.getPosition_id());
+			statement.setInt(6, staff.getDepartment_id());
+			statement.setString(7, staff.getPhone());
+			statement.setString(8, staff.getTime());
+			// 判断是否有图片
+			if (staff.getHead() != null && !staff.getHead().equals("")) {
+				statement.setString(9, staff.getHead());
+			} else {
+				statement.setString(9, "m.jpg");
+			}
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 根据id删除员工
+	public boolean admin_De_file(int file_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "delete from file where id=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, file_id);
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 文件中心上传文件
+	public boolean admin_Up_file(File adm_file) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "insert into file(title,name,upload_id,time,identity) values(?,?,?,?,?);";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, adm_file.getTitle());
+			statement.setString(2, adm_file.getName());
+			statement.setInt(3, adm_file.getUpload_id());
+			statement.setString(4, adm_file.getTime());
+			statement.setString(5, adm_file.getIdentity());
+			// 4、执行sql语句
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回false
+		return false;
+	}
+
+	// 添加员工身份证查重
+	public int Q_card(String card) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select count(*) from staff where card=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, card);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				// 获取数据
+				return result.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return 0;
+	}
+
+	// 添加员工手机查重
+	public int Q_phone(String phone) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select count(*) from staff where phone=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, phone);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				// 获取数据
+				return result.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return 0;
+	}
+
+	// 修改员工身份证查重
+	public int UQ_card(String card, int old_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select count(*) from staff where card=? and id!=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, card);
+			statement.setInt(2, old_id);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				// 获取数据
+				return result.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return 0;
+	}
+
+	// 修改员工手机查重
+	public int UQ_phone(String phone, int old_id) {
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select count(*) from staff where phone=? and id!=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, phone);
+			statement.setInt(2, old_id);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				// 获取数据
+				return result.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回null
+		return 0;
+	}
+
+	// 添加管理员查询部门
+	public List<String> admin_AQ_sta() {
+		// 定义一个集合用于存放数据
+		List<String> depname = new ArrayList<>();
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select * from department;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				String name = result.getString("name");
+				// 将对象存放在list中
+				depname.add(name);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回userList
+		return depname;
+	}
+
+	// 根据部门名查部门id
+	public int querydep_id(String depname) {
+		int dep_id = 0;
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select id from department where name=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, depname);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				dep_id = result.getInt("id");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回userList
+		return dep_id;
+	}
+
+	// 根据部门id查下属的职位
+	public List<String> querypos_name(int dep_id) {
+		// 定义一个集合用于存放数据
+		List<String> pos_name = new ArrayList<>();
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select name from positions where department_id=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, dep_id);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				String name = result.getString("name");
+				// 将对象存放在list中
+				pos_name.add(name);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回userList
+		return pos_name;
+	}
+
+	// 根据职位名查职位id
+	public int querypos_id(String DeptJob) {
+		int pos_id = 0;
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select id from positions where name=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setString(1, DeptJob);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				pos_id = result.getInt("id");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回userList
+		return pos_id;
+	}
+
+	// 根据部门id查部门名
+	public String querydep_name(int department_id) {
+		String name;
+		// 1、获取数据库链接
+		Connection con = DataSourceTool.getConnection();
+		// 2、定义sql语句
+		String sql = "select name from department where id=?;";
+		try {
+			// 3、获取sql语句对象
+			PreparedStatement statement = con.prepareStatement(sql);
+			statement.setInt(1, department_id);
+			// 4、执行sql查询语句
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				// 获取数据
+				name = result.getString("name");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 5、关闭链接
+			DataSourceTool.closeConnection(con);
+		}
+		// 默认返回userList
+		return name;
+	}
+}

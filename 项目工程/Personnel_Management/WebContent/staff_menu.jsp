@@ -1,0 +1,197 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!-- 加入tablib的声明 -->
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>menu</title>
+</head>
+<body>
+	<!-- begin::side menu -->
+	<div class="side-menu">
+		<div class='side-menu-body'>
+			<ul>
+				<li class="side-menu-divider">功能菜单</li>
+				<li class=""><a href="#"><i class="icon ti-home"></i> <span>公司查询</span>
+				</a>
+					<ul>
+						<li><a class="" href="staff_Q_dep">部门查询</a></li>     <!-- active -->
+						<li><a href="staff_Q_pos">职位查询</a></li>
+						<li><a href="staff_Q_not">公告查询</a></li>
+					</ul></li>
+					
+				<!-- <li><a href="widgets.html"><i class="icon ti-paint-bucket"></i>
+						<span>Widgets</span> <span class="badge bg-danger-gradient">8+</span>
+				</a></li> -->
+				
+				<!-- layout-builder-toggle -->
+				<li><a data-attr="" href="#"> <i
+						class="icon ti-layout"></i> <span>员工管理</span>
+				</a>
+					<ul>
+					
+						<!-- <li><a href="#">Menu</a>
+							<ul>
+								<li><a href="layout-horizontal-menu.html">Horizontal</a></li>
+								<li><a href="layout-icon-menu.html">Icon</a></li>
+								<li><a href="layout-dark-menu.html">Dark</a></li>
+								<li><a href="layout-hidden-menu.html">Hidden</a></li>
+							</ul></li> -->
+							
+						<li><a href="staff_Q_sta">查询员工信息</a></li>
+						<li><a href="staff_U_sta.jsp">修改个人信息</a></li>
+						
+						<!-- <li><a href="#">Other</a>
+							<ul>
+								<li><a href="layout-1.html">Layout 1</a></li>
+								<li><a href="layout-2.html">Layout 2</a></li>
+								<li><a href="layout-3.html">Layout 3</a></li>
+								<li><a href="layout-4.html">Layout 4</a></li>
+							</ul></li> -->
+							
+					</ul></li>
+				<li><a href="#"><i class="icon ti-rocket"></i> <span>信息管理</span>
+				</a>
+					<ul>
+						<li><a href="staff_Q_alls">收发信息</a></li>
+						<!-- <li><a href="chat.html">查询信息</a></li> -->
+						
+						<!-- <li><a href="#">Email </a>
+							<ul>
+								<li><a href="inbox.html">Inbox </a></li>
+								<li><a href="read-email.html">Email Read </a></li>
+								<li><a href="compose-email.html">Compose </a></li>
+							</ul></li>
+						<li><a href="#">Calendar </a>
+							<ul>
+								<li><a href="calendar-basic.html">Basic Calendar </a></li>
+								<li><a href="external-dragging.html">External Dragging
+								</a></li>
+								<li><a href="calendar-list.html">Calendar List </a></li>
+							</ul></li> -->
+							
+					</ul></li>
+				<li><a href="#"><i class="icon ti-layers-alt"></i> <span>文件管理</span> </a>
+					<ul>
+						<li><a href="staff_Up_file.jsp">上传文件</a></li>
+						<li><a href="staff_QD_file">查询下载文件</a></li>						
+						<li><a href="staff_D_file">删除个人文件</a></li>
+						
+						<!-- <li><a href="pagination.html">Pagination </a></li>						
+						<li><a href="dropdown.html">Dropdown </a></li>
+						<li><a href="accordion.html">Accordion </a></li> -->
+					
+						<!-- <li><a href="#">Cards </a>
+							<ul>
+								<li><a href="basic-cards.html">Basic Cards </a></li>
+								<li><a href="image-cards.html">Image Cards </a></li>
+								<li><a href="card-scroll.html">Card Scroll </a></li>
+								<li><a href="other-cards.html">Others </a></li>
+							</ul></li>
+						<li><a href="colors.html">Colors </a></li>
+						<li><a href="carousel.html">Carousel </a></li>
+						<li><a href="tables.html">Tables </a>
+							<ul>
+								<li><a href="tables.html">Basic Tables </a></li>
+								<li><a href="data-table.html">Data Table </a></li>
+								<li><a href="responsive-table.html">Responsive Table </a></li>
+							</ul></li>
+						<li><a href="typography.html">Typography </a></li>
+						<li><a href="list-group.html">List Group </a></li>
+						<li><a href="media-object.html">Media Object </a></li>
+						<li><a href="avatar.html">Avatars </a></li>
+						<li><a href="images.html">Images </a></li>
+						<li><a href="progress.html">Progrees </a></li>
+						<li><a href="modal.html">Modal </a></li>
+						<li><a href="spinners.html">Spinners </a></li>
+						<li><a href="navs.html">Navs </a></li>
+						<li><a href="tab.html">Tab </a></li>
+						<li><a href="tooltip.html">Tooltip </a></li>
+						<li><a href="popovers.html">Popovers </a></li>
+					</ul></li>
+				<li><a href="#"><i class="icon ti-paint-roller"></i> <span>Advanced
+							UI</span> </a>
+					<ul>
+						<li><a href="sweet-alert.html">Sweet Alert </a></li>
+						<li><a href="lightbox.html">Light Box </a></li>
+						<li><a href="toast.html">Toast </a></li>
+						<li><a href="tour.html">Tour </a></li>
+						<li><a href="swiper.html">Swiper </a></li>
+						<li><a href="tree-view.html">Tree View </a></li>
+					</ul></li>
+				<li><a href="#"><i class="icon ti-clipboard"></i> <span>Forms</span>
+				</a>
+					<ul>
+						<li><a href="basic-form.html">Basic Form </a></li>
+						<li><a href="custom-form.html">Custom Form </a></li>
+						<li><a href="advanced-form.html">Advanced Form </a></li>
+						<li><a href="datepicker.html">Datepicker </a></li>
+						<li><a href="timepicker.html">Timepicker </a></li>
+						<li><a href="colorpicker.html">Colorpicker </a></li>
+						<li><a href="form-validation.html">Form Validation </a></li>
+						<li><a href="form-wizard.html">Form Wizard </a></li>
+						<li><a href="file-upload.html">File Upload </a></li>
+						<li><a href="#">CKEditor </a>
+							<ul>
+								<li><a href="ckeditor-article.html">Article Editor </a></li>
+								<li><a href="ckeditor-inline.html">Inline Editor </a></li>
+							</ul></li>
+					</ul></li>
+				<li><a href="icons.html"><i class="icon ti-crown"></i> <span>Icons</span>
+				</a></li>
+				<li><a href="#"> <i class="icon ti-map"></i> <span>Maps</span>
+				</a>
+					<ul>
+						<li><a href="google-map.html">Google</a></li>
+						<li><a href="vector-map.html">Vector</a></li>
+					</ul></li>
+				<li><a href="#"> <i class="icon ti-pie-chart"></i> <span>Charts</span>
+				</a>
+					<ul>
+						<li><a href="chart-chartjs.html">Chartjs</a></li>
+						<li><a href="chart-justgage.html">Justgage</a></li>
+						<li><a href="chart-peity.html">Peity</a></li>
+					</ul></li>
+				<li><a href="#"><i class="icon ti-face-smile"></i> <span>Authentication</span>
+				</a>
+					<ul>
+						<li><a href="login.html">Login </a></li>
+						<li><a href="register.html">Register </a></li>
+						<li><a href="recover-password.html">Recovery Password </a></li>
+						<li><a href="lock-screen.html">Lock Screen </a></li>
+					</ul></li>
+				<li><a href="#"><i class="icon ti-files"></i> <span>Pages</span>
+				</a>
+					<ul>
+						<li><a href="profile.html">Profile </a></li>
+						<li><a href="timeline.html">Timeline </a></li>
+						<li><a href="invoice.html">Invoice </a></li>
+						<li><a href="pricing-table.html">Pricing Table </a></li>
+						<li><a href="search-result.html">Search Result </a></li>
+						<li><a href="blank-page.html">Blank Page V1 </a></li>
+						<li><a href="blank-page-v2.html">Blank Page V2 </a></li>
+						<li><a href="#">Errors </a>
+							<ul>
+								<li><a href="404.html">404 </a></li>
+								<li><a href="404-alternative.html">404 Alternative </a></li>
+								<li><a href="mean-at-work.html">Mean at Work </a></li>
+							</ul></li>
+					</ul></li>
+				<li><a href="#"><i class="icon ti-menu"></i> <span>Menu
+							Level</span></a>
+					<ul>
+						<li><a href="#">Menu Level </a>
+							<ul>
+								<li><a href="#">Menu Level </a></li>
+							</ul></li>
+					</ul></li> -->
+			</ul>
+			<li class=""><a href="index.jsp"><div class="col-md-3"></div><i class="icon"></i> <span>返回首页</span>
+				</a></li>
+		</div>
+	</div>
+	<!-- end::side menu -->
+</body>
+</html>

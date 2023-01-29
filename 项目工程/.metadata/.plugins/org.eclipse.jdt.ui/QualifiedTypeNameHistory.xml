@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="javax.servlet.annotation.MultipartConfig"/>
+<fullyQualifiedTypeName name="com.gec.service.StaffService"/>
+<fullyQualifiedTypeName name="com.gec.service.impl.StaffServiceImpl"/>
+<fullyQualifiedTypeName name="java.io.Serializable"/>
+<fullyQualifiedTypeName name="java.util.HashMap"/>
+<fullyQualifiedTypeName name="com.gec.entity.ResultData"/>
+<fullyQualifiedTypeName name="com.google.gson.Gson"/>
+<fullyQualifiedTypeName name="com.gec.dao.StaffDao"/>
+<fullyQualifiedTypeName name="com.mysql.jdbc.Connection"/>
+<fullyQualifiedTypeName name="com.mysql.jdbc.PreparedStatement"/>
+<fullyQualifiedTypeName name="java.sql.Connection"/>
+<fullyQualifiedTypeName name="java.sql.PreparedStatement"/>
+<fullyQualifiedTypeName name="java.sql.ResultSet"/>
+<fullyQualifiedTypeName name="com.gec.utils.DataSourceTool"/>
+<fullyQualifiedTypeName name="java.sql.SQLException"/>
+<fullyQualifiedTypeName name="com.gec.dao.AdminDao"/>
+<fullyQualifiedTypeName name="com.gec.service.AdminService"/>
+<fullyQualifiedTypeName name="com.gec.service.impl.AdminServiceImpl"/>
+<fullyQualifiedTypeName name="com.gec.entity.Admin"/>
+<fullyQualifiedTypeName name="com.gec.entity.Department"/>
+<fullyQualifiedTypeName name="com.gec.entity.Positions"/>
+<fullyQualifiedTypeName name="com.gec.entity.PageModel"/>
+<fullyQualifiedTypeName name="com.gec.entity.Notice"/>
+<fullyQualifiedTypeName name="javax.servlet.http.Part"/>
+<fullyQualifiedTypeName name="java.io.BufferedInputStream"/>
+<fullyQualifiedTypeName name="java.io.BufferedOutputStream"/>
+<fullyQualifiedTypeName name="java.io.FileOutputStream"/>
+<fullyQualifiedTypeName name="java.util.Date"/>
+<fullyQualifiedTypeName name="java.text.SimpleDateFormat"/>
+<fullyQualifiedTypeName name="com.gec.entity.File"/>
+<fullyQualifiedTypeName name="java.io.FileInputStream"/>
+<fullyQualifiedTypeName name="com.gec.entity.Staff"/>
+<fullyQualifiedTypeName name="com.gec.entity.Message"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+</qualifiedTypeNameHistroy>
